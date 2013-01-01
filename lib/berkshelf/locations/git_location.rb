@@ -15,11 +15,12 @@ module Berkshelf
     include Location
 
     set_location_key :git
-    set_valid_options :ref, :branch, :tag, :rel
+    set_valid_options :ref, :branch, :tag, :rel, :sub_directory
 
     attr_accessor :uri
     attr_accessor :branch
     attr_accessor :rel
+    attr_accessor :sub_directory
 
     alias_method :ref, :branch
     alias_method :tag, :branch
@@ -44,6 +45,7 @@ module Berkshelf
       @uri                = options[:git]
       @branch             = options[:branch] || options[:ref] || options[:tag]
       @rel                = options[:rel]
+      @sub_directory      = options[:sub_directory]
 
       Git.validate_uri!(@uri)
     end
@@ -58,10 +60,14 @@ module Berkshelf
       end
 
       tmp_path = rel ? File.join(clone, rel) : clone
+
+      # Traverse to theh sub-directory and obtain the cookbook if provided
+      tmp_path = File.join(tmp_path, sub_directory, name) if sub_directory
       unless File.chef_cookbook?(tmp_path)
         msg = "Cookbook '#{name}' not found at git: #{uri}"
         msg << " with branch '#{branch}'" if branch
         msg << " at path '#{rel}'" if rel
+        msg << " at sub directory '#{sub_directory}'" if sub_directory
         raise CookbookNotFound, msg
       end
 
@@ -97,12 +103,11 @@ module Berkshelf
 
       def clone
         tmp_clone = File.join(self.class.tmpdir, uri.gsub(/[\/:]/,'-'))
-
         unless File.exists?(tmp_clone)
           Berkshelf::Git.clone(uri, tmp_clone)
         end
-
         tmp_clone
       end
+
   end
 end
