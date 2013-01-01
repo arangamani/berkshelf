@@ -61,7 +61,7 @@ module Berkshelf
 
       tmp_path = rel ? File.join(clone, rel) : clone
 
-      # Traverse to theh sub-directory and obtain the cookbook if provided
+      # Traverse to the sub-directory and obtain the cookbook if provided
       tmp_path = File.join(tmp_path, sub_directory, name) if sub_directory
       unless File.chef_cookbook?(tmp_path)
         msg = "Cookbook '#{name}' not found at git: #{uri}"
