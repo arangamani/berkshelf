@@ -103,11 +103,12 @@ module Berkshelf
 
       def clone
         tmp_clone = File.join(self.class.tmpdir, uri.gsub(/[\/:]/,'-'))
+
         unless File.exists?(tmp_clone)
           Berkshelf::Git.clone(uri, tmp_clone)
         end
+
         tmp_clone
       end
-
   end
 end
